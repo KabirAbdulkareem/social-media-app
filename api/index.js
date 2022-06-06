@@ -9,6 +9,8 @@ const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const postRoute = require('./routes/posts')
 const port = 8800
+const multer  = require('multer')
+
 
 dotenv.config()
 
@@ -24,6 +26,15 @@ mongoose.connect(process.env.MONGO_URL,()=>{console.log("Connected to MongoDB")}
 app.use(express.json())
 app.use(helmet())
 app.use(morgan("common"))
+
+const upload = multer({ dest: 'uploads/' })
+app.post("api/",upload.single("file"),(req,res)=>{
+  try {
+    res.status(200).json("File uploaded successfully.")
+  } catch (error) {
+    
+  }
+})
 
 app.use('/api/users', userRoute)
 app.use('/api/auth', authRoute)
