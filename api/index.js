@@ -10,6 +10,7 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/posts')
 const port = 8800
 const multer  = require('multer')
+const path = require('path')
 
 
 dotenv.config()
@@ -22,17 +23,28 @@ dotenv.config()
 
 mongoose.connect(process.env.MONGO_URL,()=>{console.log("Connected to MongoDB")})
 
+app.use("/images", express.static(path.join(__dirname, "public/images")))
+
 //middleware
 app.use(express.json())
 app.use(helmet())
 app.use(morgan("common"))
 
-const upload = multer({ dest: 'uploads/' })
-app.post("api/",upload.single("file"),(req,res)=>{
+const storage = multer.diskStorage({
+  destination: (req, file, cb) =>{
+    cb(null, "./public/images")
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({storage})
+app.post("/api/upload",upload.single("file"),(req,res)=>{
   try {
-    res.status(200).json("File uploaded successfully.")
-  } catch (error) {
-    
+    return res.status(200).json("File uploaded successfully.")
+  } catch (err) {
+    console.log(err)
   }
 })
 
