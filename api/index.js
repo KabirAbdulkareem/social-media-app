@@ -32,14 +32,16 @@ app.use(morgan("common"))
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) =>{
-    cb(null, "./public/images")
+    
+    cb(null, "public/images")
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname)
+    cb(null, req.body.name)
   }
 })
 
 const upload = multer({storage})
+
 app.post("/api/upload",upload.single("file"),(req,res)=>{
   try {
     return res.status(200).json("File uploaded successfully.")
